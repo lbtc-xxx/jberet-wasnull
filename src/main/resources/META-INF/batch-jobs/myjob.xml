@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<job id="myjob" version="1.0" xmlns="http://xmlns.jcp.org/xml/ns/javaee">
+
+    <properties>
+        <property name="url" value="jdbc:h2:./target/mydb"/>
+        <property name="select" value="select col1, col2 from my_table order by col1"/>
+    </properties>
+
+    <step id="dataEntry" next="loadWithGetObject">
+        <batchlet ref="dataEntryBatchlet">
+            <properties>
+                <property name="url" value="#{jobProperties['url']}"/>
+            </properties>
+        </batchlet>
+    </step>
+
+    <!-- produces: [{COL2=COL1 should be NULL, COL1=null}, {COL2=COL1 should be 1, COL1=1}] -->
+    <step id="loadWithGetObject" next="loadWithColumnTypes">
+        <chunk>
+            <reader ref="jdbcItemReader">
+                <properties>
+                    <property name="beanType" value="java.util.Map"/>
+                    <property name="url" value="#{jobProperties['url']}"/>
+                    <property name="sql" value="#{jobProperties['select']}"/>
+                </properties>
+            </reader>
+            <writer ref="stdOutItemWriter"/>
+        </chunk>
+    </step>
+
+    <!-- produces: [{COL2=COL1 should be NULL, COL1=0}, {COL2=COL1 should be 1, COL1=1}] -->
+    <step id="loadWithColumnTypes">
+        <chunk>
+            <reader ref="jdbcItemReader">
+                <properties>
+                    <property name="beanType" value="java.util.Map"/>
+                    <property name="url" value="#{jobProperties['url']}"/>
+                    <property name="sql" value="#{jobProperties['select']}"/>
+                    <property name="columnTypes" value="Int, String"/>
+                </properties>
+            </reader>
+            <writer ref="stdOutItemWriter"/>
+        </chunk>
+    </step>
+
+</job>

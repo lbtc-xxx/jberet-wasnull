@@ -1,0 +1,4 @@
+<batch-artifacts xmlns="http://xmlns.jcp.org/xml/ns/javaee">
+    <ref id="dataEntryBatchlet" class="app.DataEntryBatchlet"/>
+    <ref id="stdOutItemWriter" class="app.StdOutItemWriter"/>
+</batch-artifacts>
